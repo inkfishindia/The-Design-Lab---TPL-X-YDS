@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Design Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath d='M12 2L2 12l10 10 10-10L12 2z' fill='%23144A87'/%3e%3c/svg%3e">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/react-grid-layout/1.4.4/styles.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/react-resizable/3.0.5/styles.min.css" />
+    <script>
+      // NOTE: This is a workaround for a browser-only environment where process.env is not available.
+      // In a typical build setup, these variables would be injected automatically.
+      window.process = {
+        env: {
+          // IMPORTANT: You must replace this placeholder value with your own Gemini API Key.
+          // Get your key from Google AI Studio: https://aistudio.google.com/app/apikey
+          API_KEY: "YOUR_GEMINI_API_KEY_HERE",
+          
+          // The Google Client ID has been set for you.
+          // If you need to change it, get it from the Google Cloud Console: https://console.cloud.google.com/apis/credentials
+          GOOGLE_CLIENT_ID: "155749101771-lvmc383eus9pg407dedlp3r2q330gukj.apps.googleusercontent.com"
+        }
+      };
+    </script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'heritage-blue': '#144A87',
+              'creativity-orange': '#FF8C42',
+              'cream': '#FDF6E3',
+              'midnight-navy': '#0A192F',
+              'success-green': '#10B981',
+              'error-red': '#EF4444',
+              'warning-yellow': '#F59E0B',
+            },
+            fontFamily: {
+              display: ['Montserrat', 'sans-serif'],
+              sans: ['Inter', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.21.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.3.19",
+    "react-grid-layout": "https://esm.sh/react-grid-layout@1.4.4"
+  }
+}
+</script>
+</head>
+  <body class="bg-heritage-blue text-cream font-sans antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
