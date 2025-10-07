@@ -1,198 +1,162 @@
-import type { GoogleUser, DelegationBriefForSheet } from '../types';
+import { getCache, setCache } from './cachingService';
+import { SPREADSHEET_CONFIG, SHEET_REGISTRY, SheetKey } from './configService';
+import { getMockData } from './mockDataService';
+import { SheetRow } from '../types';
 
-const SHEETS_API_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
-// The user-provided spreadsheet
-const SPREADSHEET_ID = '1wvjgA8ESxxn_hl86XeL_gOecDjSYPgSo6qyzewP-oJw';
-const LOG_SHEET_NAME = 'BrainDump';
-const LOGIN_SHEET_NAME = 'Login';
-const TEAM_ACTIVITY_SHEET_NAME = 'Team Activity Log';
+const CSV_CACHE_TTL_MINUTES = 5;
+const SHEETS_API_BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
 
-/**
- * Appends a brain dump entry to a Google Sheet.
- * @param content The brain dump text.
- * @param user The authenticated Google user.
- * @param accessToken The user's Google OAuth2 access token.
- * @param priority The AI-determined priority ('High', 'Medium', 'Low').
- */
-export const logBrainDump = async (
-  content: string, 
-  user: GoogleUser | null, 
-  accessToken: string, 
-  priority: string
-): Promise<void> => {
-  if (!user) {
-    console.warn('Cannot log brain dump without an authenticated user.');
-    return;
-  }
-  
-  const timestamp = new Date().toISOString();
-  const values = [
-    [
-      timestamp,       // Timestamp
-      'Brain Dump',    // Type
-      content,         // Content
-      user.email,      // UserEmail
-      priority         // Priority
-    ]
-  ];
 
-  const body = {
-    values,
-  };
-  
-  const response = await fetch(
-    `${SHEETS_API_URL}/${SPREADSHEET_ID}/values/${LOG_SHEET_NAME}:append?valueInputOption=USER_ENTERED`, 
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+export const fetchSheetData = async (sheetKey: SheetKey, token: string | null): Promise<any[]> => {
+    const cacheKey = `sheet_data_${sheetKey}`;
+    const cachedData = getCache<any[]>(cacheKey);
+    if (cachedData) {
+        return cachedData;
     }
-  );
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error.message || 'Failed to append data to Google Sheet.');
-  }
-};
-
-/**
- * Appends a delegated task to a Google Sheet.
- * @param brief The delegation brief containing task details.
- * @param user The authenticated Google user who is delegating.
- * @param accessToken The user's Google OAuth2 access token.
- */
-export const logDelegation = async (
-  brief: DelegationBriefForSheet,
-  user: GoogleUser,
-  accessToken: string,
-): Promise<void> => {
-  const timestamp = new Date().toISOString();
-  const values = [
-    [
-      timestamp,                // Timestamp
-      'Delegation',             // Type
-      brief.task,               // Content/Task
-      user.email,               // UserEmail (Delegated By)
-      user.name,                // UserName (Delegated By)
-      '',                       // Priority (N/A)
-      brief.assignedTo,         // Assigned To
-      brief.context,            // Context
-      brief.successCriteria,    // Success Criteria
-      'Delegated',              // Status
-    ]
-  ];
-
-  const body = { values };
-  
-  const response = await fetch(
-    `${SHEETS_API_URL}/${SPREADSHEET_ID}/values/${LOGIN_SHEET_NAME}:append?valueInputOption=USER_ENTERED`, 
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+    const sheetInfo = SHEET_REGISTRY[sheetKey];
+    if (!sheetInfo) {
+        throw new Error(`Sheet with key "${sheetKey}" not found in registry.`);
     }
-  );
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error.message || 'Failed to append delegation data to Google Sheet.');
-  }
-};
-
-/**
- * Appends a user sign-in event to a Google Sheet.
- * @param user The authenticated Google user who signed in.
- * @param accessToken The user's Google OAuth2 access token.
- */
-export const logUserSignIn = async (
-  user: GoogleUser,
-  accessToken: string,
-): Promise<void> => {
-  const timestamp = new Date().toISOString();
-  const values = [
-    [
-      timestamp,          // Timestamp
-      'User Sign-In',     // Type
-      'User logged in',   // Content/Task
-      user.email,         // UserEmail
-      user.name,          // UserName
-      '',                 // Priority
-      '',                 // Assigned To
-      '',                 // Context
-      '',                 // Success Criteria
-      'Completed',        // Status
-    ]
-  ];
-
-  const body = { values };
-
-  const response = await fetch(
-    `${SHEETS_API_URL}/${SPREADSHEET_ID}/values/${LOGIN_SHEET_NAME}:append?valueInputOption=USER_ENTERED`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+    if (!token) {
+        console.warn(`Not authenticated. Using mock data for sheet: ${sheetKey}`);
+        const mockData = getMockData(sheetKey);
+        setCache(cacheKey, mockData, CSV_CACHE_TTL_MINUTES);
+        return mockData;
     }
-  );
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error.message || 'Failed to append sign-in data to Google Sheet.');
-  }
-};
-
-/**
- * Fetches data from the Team Activity Log sheet.
- * @param accessToken The user's Google OAuth2 access token.
- */
-export const getTeamActivityLog = async (accessToken: string): Promise<string[][]> => {
-  const range = `${TEAM_ACTIVITY_SHEET_NAME}!A:J`; // Read up to 10 columns for full context
-  const response = await fetch(
-    `${SHEETS_API_URL}/${SPREADSHEET_ID}/values/${range}`,
-    {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error.message || 'Failed to fetch sheet data.');
-  }
-
-  const data = await response.json();
-  return data.values || []; // `values` can be undefined if sheet is empty
-};
-
-/**
- * Reads data from a specific range in a Google Sheet.
- * @param spreadsheetId The ID of the Google Sheet.
- * @param range The A1 notation of the range to read.
- * @param accessToken The user's Google OAuth2 access token.
- */
-export const readSheetData = async (spreadsheetId: string, range: string, accessToken: string): Promise<string[][]> => {
-    const url = `${SHEETS_API_URL}/${spreadsheetId}/values/${encodeURIComponent(range)}`;
+    
+    const spreadsheetId = SPREADSHEET_CONFIG[sheetInfo.spreadsheetKey];
+    const range = sheetInfo.sheetName.includes(' ') ? `'${sheetInfo.sheetName}'` : sheetInfo.sheetName;
+    const url = `${SHEETS_API_BASE_URL}/${spreadsheetId}/values/${range}`;
+    
     const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` }
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error.message || 'Failed to read data from Google Sheet.');
+        if (response.status === 401) throw new Error('Authentication failed. Please sign in again.');
+        if (response.status === 403) throw new Error(`Permission denied for sheet "${sheetKey}". Ensure API access is enabled.`);
+        throw new Error(`Failed to fetch sheet ${sheetKey}. Status: ${response.status}`);
     }
 
-    const data = await response.json();
-    return data.values || [];
+    const result = await response.json();
+    const [headers, ...rows] = result.values;
+    
+    const data = rows.map((row: any[], index: number) => {
+        const rowObject: any = { rowIndex: index + 1 }; // 1-based index for data rows
+        headers.forEach((header: string, i: number) => {
+            if (header) {
+                rowObject[header] = row[i] || null;
+            }
+        });
+        return rowObject;
+    });
+    
+    setCache(cacheKey, data, CSV_CACHE_TTL_MINUTES);
+    return data;
+};
+
+const getSheetHeaders = async (sheetKey: SheetKey, token: string): Promise<string[]> => {
+  const cacheKey = `sheet_headers_${sheetKey}`;
+  const cachedHeaders = getCache<string[]>(cacheKey);
+  if (cachedHeaders) return cachedHeaders;
+
+  const sheetInfo = SHEET_REGISTRY[sheetKey];
+  if (!sheetInfo) throw new Error(`Sheet with key "${sheetKey}" not found in registry.`);
+  
+  const spreadsheetId = SPREADSHEET_CONFIG[sheetInfo.spreadsheetKey];
+  const sheetName = sheetInfo.sheetName.includes(' ') ? `'${sheetInfo.sheetName}'` : sheetInfo.sheetName;
+  const range = `${sheetName}!1:1`;
+  const url = `${SHEETS_API_BASE_URL}/${spreadsheetId}/values/${range}`;
+
+  const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+  if (!response.ok) throw new Error(`Failed to fetch headers for ${sheetKey}.`);
+
+  const data = await response.json();
+  const headers: string[] = data.values[0];
+  setCache(cacheKey, headers, 60);
+  return headers;
+};
+
+const mapObjectToRowArray = (rowData: SheetRow, headers: string[]): any[] => {
+  return headers.map(header => rowData[header] ?? '');
+};
+
+export const appendRow = async (sheetKey: SheetKey, rowData: Omit<SheetRow, 'rowIndex'>, token: string) => {
+  const sheetInfo = SHEET_REGISTRY[sheetKey];
+  const spreadsheetId = SPREADSHEET_CONFIG[sheetInfo.spreadsheetKey];
+  const headers = await getSheetHeaders(sheetKey, token);
+  const rowAsArray = mapObjectToRowArray(rowData as SheetRow, headers);
+
+  const range = sheetInfo.sheetName.includes(' ') ? `'${sheetInfo.sheetName}'` : sheetInfo.sheetName;
+  const url = `${SHEETS_API_BASE_URL}/${spreadsheetId}/values/${range}:append?valueInputOption=USER_ENTERED`;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [rowAsArray] }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error.message || `Failed to append row to ${sheetKey}.`);
+  }
+  return await response.json();
+};
+
+export const updateRow = async (sheetKey: SheetKey, rowIndex: number, rowData: SheetRow, token: string) => {
+  const sheetInfo = SHEET_REGISTRY[sheetKey];
+  const spreadsheetId = SPREADSHEET_CONFIG[sheetInfo.spreadsheetKey];
+  const headers = await getSheetHeaders(sheetKey, token);
+  const rowAsArray = mapObjectToRowArray(rowData, headers);
+
+  const sheetRowNumber = rowIndex + 1;
+  const sheetName = sheetInfo.sheetName.includes(' ') ? `'${sheetInfo.sheetName}'` : sheetInfo.sheetName;
+  const range = `${sheetName}!A${sheetRowNumber}`;
+  
+  const url = `${SHEETS_API_BASE_URL}/${spreadsheetId}/values/${range}?valueInputOption=USER_ENTERED`;
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [rowAsArray] }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error.message || `Failed to update row in ${sheetKey}.`);
+  }
+  return await response.json();
+};
+
+export const deleteRow = async (sheetKey: SheetKey, rowIndex: number, token: string) => {
+  const sheetInfo = SHEET_REGISTRY[sheetKey];
+  const spreadsheetId = SPREADSHEET_CONFIG[sheetInfo.spreadsheetKey];
+  
+  const request = {
+    requests: [{
+      deleteDimension: {
+        range: {
+          sheetId: parseInt(sheetInfo.gid, 10),
+          dimension: 'ROWS',
+          startIndex: rowIndex, 
+          endIndex: rowIndex + 1,
+        },
+      },
+    }],
+  };
+  
+  const url = `${SHEETS_API_BASE_URL}/${spreadsheetId}:batchUpdate`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error.message || `Failed to delete row from ${sheetKey}.`);
+  }
+  return await response.json();
 };

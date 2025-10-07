@@ -12,16 +12,16 @@ type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
 };
 
 export const Select: React.FC<SelectProps> = ({ label, id, children, ...props }) => {
-  const baseClasses = "block w-full px-4 py-3 bg-white border border-midnight-navy/30 rounded-lg text-sm placeholder-midnight-navy/50 focus:outline-none focus:ring-2 focus:ring-heritage-blue focus:border-heritage-blue transition-colors appearance-none";
+  const baseClasses = "block w-full rounded-lg bg-dark-bg px-4 py-2.5 text-text-light border border-dark-border focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition-colors placeholder-text-muted/50 text-sm appearance-none";
 
   return (
-    <div>
-      {label && <label htmlFor={id} className="block text-sm font-medium text-midnight-navy/80 mb-1.5">{label}</label>}
+    <div className="w-full">
+      {label && <label htmlFor={id} className="block text-sm font-semibold text-text-muted mb-1.5">{label}</label>}
       <div className="relative">
         <select id={id} className={baseClasses} {...props}>
           {children}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-midnight-navy/60">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-text-muted/60">
             <ChevronDownIcon />
         </div>
       </div>

@@ -61,13 +61,13 @@ export const CampaignIdeator: React.FC = () => {
 
   const ApiKeyWarning = () => (
     isApiKeyMissing && (
-      <p className="text-xs text-warning-yellow mt-2 text-center">API Key missing. Please configure in index.html.</p>
+      <p className="text-xs text-accent-yellow mt-2 text-center">API Key missing. Please configure in index.html.</p>
     )
   );
 
   return (
-    <Card>
-      <h3 className="text-lg font-semibold text-midnight-navy text-center">Campaign Ideator</h3>
+    <Card className="h-full flex flex-col">
+      <h3 className="text-lg font-semibold text-text-light text-center">Campaign Ideator</h3>
       <div className="mt-4">
         <Textarea
           id="product-info"
@@ -80,6 +80,7 @@ export const CampaignIdeator: React.FC = () => {
         <Button
           onClick={generateIdeas}
           disabled={isLoading || !productInfo.trim() || isApiKeyMissing}
+          variant="creative"
           className="mt-3 w-full"
           leftIcon={<SparklesIcon className="w-5 h-5" />}
         >
@@ -88,14 +89,14 @@ export const CampaignIdeator: React.FC = () => {
         <ApiKeyWarning />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex-grow">
         {error && <p className="text-sm text-error-red">{error}</p>}
         {ideas && (
-          <div className="space-y-4 border-t border-midnight-navy/10 pt-4">
+          <div className="space-y-4 border-t border-dark-border pt-4">
             {ideas.map((idea, index) => (
-              <div key={index} className="p-3 bg-cream rounded-md">
-                <h4 className="font-semibold text-midnight-navy">{idea.name}</h4>
-                <p className="text-sm text-midnight-navy/90 mt-1">{idea.description}</p>
+              <div key={index} className="p-3 bg-dark-bg/50 rounded-md">
+                <h4 className="font-semibold text-text-light">{idea.name}</h4>
+                <p className="text-sm text-text-light/90 mt-1">{idea.description}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {idea.channels.map(channel => (
                     <Badge key={channel}>{channel}</Badge>

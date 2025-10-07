@@ -1,8 +1,9 @@
+
 import React, { useRef, useEffect } from 'react';
 
 const cn = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(' ');
 
-const baseClasses = 'block w-full rounded-none bg-transparent px-2 py-2.5 text-midnight-navy border-0 border-b-2 border-midnight-navy/30 focus:outline-none focus:ring-0 focus:border-heritage-blue transition-colors placeholder-midnight-navy/60';
+const baseClasses = 'block w-full rounded-lg bg-dark-bg px-4 py-2.5 text-text-light border border-dark-border focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition-colors placeholder-text-muted/50 text-sm';
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
@@ -10,8 +11,8 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, id, className, ...props }, ref) => (
-    <div>
-      {label && <label htmlFor={id} className="block text-sm font-semibold text-midnight-navy/80 mb-1">{label}</label>}
+    <div className="w-full">
+      {label && <label htmlFor={id} className="block text-sm font-semibold text-text-muted mb-1.5">{label}</label>}
       <input ref={ref} id={id} className={cn(baseClasses, className)} {...props} />
     </div>
   )
@@ -46,8 +47,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     };
 
     return (
-      <div>
-        {label && <label htmlFor={id} className="block text-sm font-semibold text-midnight-navy/80 mb-1">{label}</label>}
+      <div className="w-full">
+        {label && <label htmlFor={id} className="block text-sm font-semibold text-text-muted mb-1.5">{label}</label>}
         <textarea
           ref={(node) => {
             if (node) {
@@ -61,7 +62,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           }}
           id={id}
           rows={rows}
-          className={cn(baseClasses, 'resize-none overflow-y-hidden', className)}
+          className={cn(baseClasses, 'resize-none overflow-y-hidden leading-relaxed', className)}
           onChange={handleChange}
           {...props}
         />

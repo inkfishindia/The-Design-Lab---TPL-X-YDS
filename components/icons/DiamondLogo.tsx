@@ -1,8 +1,6 @@
 import React from 'react';
-// FIX: Import SVGMotionProps to correctly type the component props for a motion SVG element.
 import { motion, SVGMotionProps } from 'framer-motion';
 
-// FIX: Use SVGMotionProps<SVGSVGElement> for the component's props to ensure type compatibility with motion.svg.
 export const DiamondLogo: React.FC<SVGMotionProps<SVGSVGElement>> = (props) => (
   <motion.svg
     viewBox="0 0 24 24"

@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.1.1",
+    "react": "18.3.1",
     "@google/genai": "^1.21.0",
-    "react-dom": "^19.1.1",
-    "framer-motion": "^11.3.19",
-    "react-grid-layout": "1.4.4"
+    "framer-motion": "11.3.19",
+    "react-resizable": "3.0.5",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

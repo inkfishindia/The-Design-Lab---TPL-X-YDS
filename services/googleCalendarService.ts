@@ -1,7 +1,7 @@
-import { PendingEvent, CalendarListItem } from '../types';
+import { PendingEvent, CalendarListItem, CalendarEvent } from '../types';
 
-const CALENDAR_API_URL = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
-const CALENDAR_LIST_API_URL = 'https://www.googleapis.com/calendar/v3/users/me/calendarList';
+const CALENDAR_API_BASE_URL = 'https://www.googleapis.com/calendar/v3';
+const CALENDAR_LIST_API_URL = `${CALENDAR_API_BASE_URL}/users/me/calendarList`;
 
 
 export const createEvent = async (event: PendingEvent, accessToken: string) => {
@@ -19,7 +19,7 @@ export const createEvent = async (event: PendingEvent, accessToken: string) => {
     },
   };
 
-  const response = await fetch(CALENDAR_API_URL, {
+  const response = await fetch(`${CALENDAR_API_BASE_URL}/calendars/primary/events`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
@@ -36,14 +36,15 @@ export const createEvent = async (event: PendingEvent, accessToken: string) => {
   return await response.json();
 };
 
-export const getEvents = async (accessToken: string, timeMin?: string, timeMax?: string) => {
+export const getEvents = async (calendarId: string, accessToken: string, timeMin?: string, timeMax?: string, maxResults?: number): Promise<CalendarEvent[]> => {
   const params = new URLSearchParams();
   if (timeMin) params.append('timeMin', timeMin);
   if (timeMax) params.append('timeMax', timeMax);
+  if (maxResults) params.append('maxResults', String(maxResults));
   params.append('orderBy', 'startTime');
   params.append('singleEvents', 'true');
 
-  const url = `${CALENDAR_API_URL}?${params.toString()}`;
+  const url = `${CALENDAR_API_BASE_URL}/calendars/${calendarId}/events?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {
@@ -57,13 +58,64 @@ export const getEvents = async (accessToken: string, timeMin?: string, timeMax?:
   }
 
   const data = await response.json();
-  // Return a simplified version of the event data for the AI
-  return data.items?.map((event: any) => ({
+  // Return a more detailed version of the event data for UI components
+  return data.items?.map((event: any): CalendarEvent => ({
+      id: event.id,
       summary: event.summary,
-      start: event.start.dateTime || event.start.date,
-      end: event.end.dateTime || event.end.date,
+      start: {
+        dateTime: event.start.dateTime,
+        date: event.start.date,
+        timeZone: event.start.timeZone,
+      },
+      end: {
+        dateTime: event.end.dateTime,
+        date: event.end.date,
+        timeZone: event.end.timeZone,
+      },
       location: event.location,
+      description: event.description,
   })) || [];
+};
+
+export const updateEvent = async (
+    calendarId: string,
+    eventId: string,
+    eventData: Partial<Pick<CalendarEvent, 'summary' | 'location' | 'description'>>,
+    accessToken: string
+): Promise<CalendarEvent> => {
+    const response = await fetch(`${CALENDAR_API_BASE_URL}/calendars/${calendarId}/events/${eventId}`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error.message || 'Failed to update calendar event.');
+    }
+    return response.json();
+};
+
+export const deleteEvent = async (calendarId: string, eventId: string, accessToken: string): Promise<void> => {
+    const response = await fetch(`${CALENDAR_API_BASE_URL}/calendars/${calendarId}/events/${eventId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+
+    if (response.status !== 204) {
+        let errorData;
+        try {
+            errorData = await response.json();
+        } catch(e) {
+            throw new Error('Failed to delete event.');
+        }
+        throw new Error(errorData?.error?.message || 'Failed to delete event.');
+    }
 };
 
 export const getCalendarList = async (accessToken: string): Promise<CalendarListItem[]> => {

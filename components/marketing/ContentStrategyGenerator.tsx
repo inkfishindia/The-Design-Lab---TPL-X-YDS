@@ -108,18 +108,18 @@ export const ContentStrategyGenerator: React.FC<ContentStrategyGeneratorProps> =
   );
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <h3 className="text-lg font-semibold text-midnight-navy">AI - Content Strategy Generator</h3>
       <div className="mt-4 space-y-4">
         <Textarea id="brief" label="Campaign or Idea Brief" value={brief} onChange={e => setBrief(e.target.value)} placeholder="e.g., Launching our new summer collection..." rows={3} />
         <Textarea id="audience" label="Target Audience" value={audience} onChange={e => setAudience(e.target.value)} placeholder="e.g., Tech-savvy founders, aged 25-40..." rows={3} />
-        <Button onClick={generateStrategy} disabled={isLoading || !brief.trim() || !audience.trim() || isApiKeyMissing} className="w-full" leftIcon={<SparklesIcon className="w-5 h-5" />}>
+        <Button onClick={generateStrategy} disabled={isLoading || !brief.trim() || !audience.trim() || isApiKeyMissing} variant="creative" className="w-full" leftIcon={<SparklesIcon className="w-5 h-5" />}>
           {isLoading ? 'Generating...' : 'Generate Content Strategy'}
         </Button>
         <ApiKeyWarning />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex-grow">
         {error && <p className="text-sm text-error-red">{error}</p>}
         {strategy && (
           <div className="space-y-3 text-sm border-t border-midnight-navy/10 pt-4">

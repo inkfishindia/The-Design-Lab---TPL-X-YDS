@@ -61,39 +61,39 @@ export const CompetitorListeningBlock: React.FC = () => {
 
   const ApiKeyWarning = () => (
     isApiKeyMissing && (
-      <p className="text-xs text-warning-yellow mt-2">API Key missing. Please configure in index.html.</p>
+      <p className="text-xs text-accent-yellow mt-2">API Key missing. Please configure in index.html.</p>
     )
   );
 
   return (
-    <Card>
-      <h3 className="text-lg font-semibold text-midnight-navy">Competitor Listening</h3>
+    <Card className="h-full flex flex-col">
+      <h3 className="text-lg font-semibold text-text-light">Competitor Listening</h3>
       <div className="mt-4 space-y-4">
         <div>
-          <label className="text-sm font-medium text-midnight-navy/80 block mb-2">Select Competitors to Monitor</label>
+          <label className="text-sm font-medium text-text-muted block mb-2">Select Competitors to Monitor</label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {allCompetitors.length > 0 ? allCompetitors.map(c => (
               <button
                 key={c.name}
                 onClick={() => handleToggleCompetitor(c.name)}
-                className={`text-sm p-2 rounded-md transition-colors border ${selectedCompetitors.includes(c.name) ? 'bg-heritage-blue text-white border-heritage-blue' : 'bg-cream hover:bg-midnight-navy/10 border-midnight-navy/20'}`}
+                className={`text-sm p-2 rounded-md transition-colors border ${selectedCompetitors.includes(c.name) ? 'bg-accent-blue text-white border-accent-blue' : 'bg-dark-surface hover:bg-dark-border border-dark-border'}`}
               >
                 {c.name}
               </button>
-            )) : <p className="text-sm text-midnight-navy/60 col-span-full">Add competitors in the Strategy &gt; Competitor Hub tab.</p>}
+            )) : <p className="text-sm text-text-muted col-span-full">Add competitors in the Strategy &gt; Competitor Hub tab.</p>}
           </div>
         </div>
-        <Button onClick={fetchPosts} disabled={isLoading || selectedCompetitors.length === 0 || isApiKeyMissing} className="w-full" leftIcon={<SparklesIcon className="w-5 h-5" />}>
+        <Button onClick={fetchPosts} disabled={isLoading || selectedCompetitors.length === 0 || isApiKeyMissing} variant="creative" className="w-full" leftIcon={<SparklesIcon className="w-5 h-5" />}>
           {isLoading ? 'Fetching Posts...' : 'Fetch Latest Posts'}
         </Button>
         <ApiKeyWarning />
       </div>
-      <div className="mt-6">
+      <div className="mt-6 flex-grow">
         {error && <p className="text-sm text-error-red">{error}</p>}
         {results && (
-          <div className="space-y-3 text-sm border-t border-midnight-navy/10 pt-4">
-            <h4 className="font-bold text-midnight-navy text-base">Listening Results:</h4>
-            <p className="text-midnight-navy/90 whitespace-pre-wrap leading-relaxed">{results}</p>
+          <div className="space-y-3 text-sm border-t border-dark-border pt-4">
+            <h4 className="font-bold text-text-light text-base">Listening Results:</h4>
+            <p className="text-text-muted whitespace-pre-wrap leading-relaxed">{results}</p>
           </div>
         )}
       </div>

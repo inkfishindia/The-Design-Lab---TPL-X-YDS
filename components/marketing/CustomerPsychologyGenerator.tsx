@@ -121,21 +121,21 @@ export const CustomerPsychologyGenerator: React.FC<CustomerPsychologyGeneratorPr
   
   const ApiKeyWarning = () => (
     isApiKeyMissing && (
-      <p className="text-xs text-warning-yellow mt-2">API Key missing. Please configure in index.html.</p>
+      <p className="text-xs text-accent-yellow mt-2">API Key missing. Please configure in index.html.</p>
     )
   );
   
   const Section: React.FC<{title: string, items: string[]}> = ({title, items}) => (
     <div className="pt-2">
       <Badge color="blue">{title}</Badge>
-      <ul className="list-disc list-inside text-midnight-navy/90 mt-1 space-y-1">{items.map((item, i) => <li key={i}>{item}</li>)}</ul>
+      <ul className="list-disc list-inside text-text-muted mt-1 space-y-1">{items.map((item, i) => <li key={i}>{item}</li>)}</ul>
     </div>
   );
 
 
   return (
-    <Card>
-      <h3 className="text-lg font-semibold text-midnight-navy">AI - Customer Psychology Generator</h3>
+    <Card className="h-full flex flex-col">
+      <h3 className="text-lg font-semibold text-text-light">AI - Customer Psychology Generator</h3>
       <div className="mt-4 space-y-6">
         <Select 
             id="brand-select" 
@@ -146,18 +146,18 @@ export const CustomerPsychologyGenerator: React.FC<CustomerPsychologyGeneratorPr
             {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
         </Select>
         <Textarea id="goal" label="Target or Goal" value={goal} onChange={e => setGoal(e.target.value)} placeholder="e.g., Increase sign-ups for our new AI tool by 20%..." rows={3} />
-        <Button onClick={generateProfile} disabled={isLoading || !goal.trim() || !selectedBrandId || isApiKeyMissing} className="w-full" leftIcon={<SparklesIcon className="w-5 h-5" />}>
+        <Button onClick={generateProfile} disabled={isLoading || !goal.trim() || !selectedBrandId || isApiKeyMissing} variant="creative" className="w-full" leftIcon={<SparklesIcon className="w-5 h-5" />}>
           {isLoading ? 'Generating...' : 'Generate Psychology Profile'}
         </Button>
         <ApiKeyWarning />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex-grow">
         {error && <p className="text-sm text-error-red">{error}</p>}
         {profile && (
-          <div className="space-y-3 text-sm border-t border-midnight-navy/10 pt-4">
-            <h4 className="font-bold text-midnight-navy text-base">Persona: {profile.personaBasics.name}</h4>
-            <p className="text-midnight-navy/80">{profile.personaBasics.demographics}</p>
+          <div className="space-y-3 text-sm border-t border-dark-border pt-4">
+            <h4 className="font-bold text-text-light text-base">Persona: {profile.personaBasics.name}</h4>
+            <p className="text-text-muted">{profile.personaBasics.demographics}</p>
             
             <Section title="Journey Mapping" items={profile.journeyMapping} />
             <Section title="Behavioral Triggers" items={profile.behavioralTriggers} />

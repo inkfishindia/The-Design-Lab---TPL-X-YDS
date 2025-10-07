@@ -11,25 +11,21 @@ interface WidgetIconsProps {
 const widgets = [
   {
     name: 'Tasks',
-    // FIX: The `WidgetIcon` component expects a prop named `Icon` (with a capital 'I'), but this object was using `icon`. The property name has been updated to match the component's props.
     Icon: TasksIcon,
     url: 'https://tasks.google.com/u/0/embed/?origin=https://mail.google.com',
   },
   {
     name: 'Sheets',
-    // FIX: The `WidgetIcon` component expects a prop named `Icon` (with a capital 'I'), but this object was using `icon`. The property name has been updated to match the component's props.
     Icon: SheetIcon,
     url: 'https://docs.google.com/spreadsheets/',
   },
   {
     name: 'Drive',
-    // FIX: The `WidgetIcon` component expects a prop named `Icon` (with a capital 'I'), but this object was using `icon`. The property name has been updated to match the component's props.
     Icon: DriveIcon,
     url: 'https://drive.google.com/',
   },
   {
     name: 'Gmail',
-    // FIX: The `WidgetIcon` component expects a prop named `Icon` (with a capital 'I'), but this object was using `icon`. The property name has been updated to match the component's props.
     Icon: GmailIcon,
     url: 'https://mail.google.com/',
   },

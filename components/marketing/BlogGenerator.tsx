@@ -58,13 +58,13 @@ export const BlogGenerator: React.FC = () => {
   
   const ApiKeyWarning = () => (
     isApiKeyMissing && (
-      <p className="text-xs text-warning-yellow mt-2 text-center">API Key missing. Please configure in index.html.</p>
+      <p className="text-xs text-accent-yellow mt-2 text-center">API Key missing. Please configure in index.html.</p>
     )
   );
 
   return (
-    <Card>
-      <h3 className="text-lg font-semibold text-midnight-navy text-center">Blog Post Generator</h3>
+    <Card className="h-full flex flex-col">
+      <h3 className="text-lg font-semibold text-text-light text-center">Blog Post Generator</h3>
       <div className="mt-4">
         <Textarea
           id="blog-topic"
@@ -77,6 +77,7 @@ export const BlogGenerator: React.FC = () => {
         <Button
           onClick={generateBlog}
           disabled={isLoading || !topic.trim() || isApiKeyMissing}
+          variant="creative"
           className="mt-3 w-full"
           leftIcon={<SparklesIcon className="w-5 h-5" />}
         >
@@ -85,16 +86,16 @@ export const BlogGenerator: React.FC = () => {
         <ApiKeyWarning />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex-grow">
         {error && <p className="text-sm text-error-red">{error}</p>}
         {blogPost && (
-          <div className="space-y-4 text-sm border-t border-midnight-navy/10 pt-4">
-            <h4 className="text-xl font-bold text-midnight-navy">{blogPost.title}</h4>
-            <div className="p-3 bg-cream rounded-md">
+          <div className="space-y-4 text-sm border-t border-dark-border pt-4">
+            <h4 className="text-xl font-bold text-text-light">{blogPost.title}</h4>
+            <div className="p-3 bg-dark-bg/50 rounded-md">
                 <Badge color="orange">Meta Description</Badge>
-                <p className="text-midnight-navy/80 italic text-xs mt-1">"{blogPost.metaDescription}"</p>
+                <p className="text-text-muted italic text-xs mt-1">"{blogPost.metaDescription}"</p>
             </div>
-            <div className="text-midnight-navy/90 whitespace-pre-wrap leading-relaxed">
+            <div className="text-text-light/90 whitespace-pre-wrap leading-relaxed">
               {blogPost.content}
             </div>
           </div>

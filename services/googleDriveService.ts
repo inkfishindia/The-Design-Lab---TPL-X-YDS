@@ -1,5 +1,6 @@
 
 
+
 const DRIVE_API_FILES_URL = 'https://www.googleapis.com/drive/v3/files';
 const DRIVE_API_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
 
@@ -41,6 +42,47 @@ export const createDoc = async (title: string, content: string, accessToken: str
   }
 
   return await response.json();
+};
+
+
+/**
+ * Creates a new Google Sheet in the user's Google Drive from CSV content.
+ * @param title The title of the spreadsheet.
+ * @param csvContent The CSV string content of the sheet.
+ * @param accessToken The user's Google OAuth2 access token.
+ * @returns The file metadata object from the Google Drive API.
+ */
+export const createSheet = async (title: string, csvContent: string, accessToken: string) => {
+    const metadata = {
+        name: title,
+        mimeType: 'application/vnd.google-apps.spreadsheet',
+    };
+
+    const boundary = '----BOUNDARY----';
+    const multipartRequestBody =
+        `--${boundary}\r\n` +
+        `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+        `${JSON.stringify(metadata)}\r\n` +
+        `--${boundary}\r\n` +
+        `Content-Type: text/csv\r\n\r\n` +
+        `${csvContent}\r\n` +
+        `--${boundary}--`;
+
+    const response = await fetch(DRIVE_API_UPLOAD_URL, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': `multipart/related; boundary=${boundary}`,
+        },
+        body: multipartRequestBody,
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error.message || 'Failed to create Google Sheet.');
+    }
+
+    return await response.json();
 };
 
 /**

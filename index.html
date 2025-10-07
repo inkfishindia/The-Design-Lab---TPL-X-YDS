@@ -6,10 +6,71 @@
     <title>The Design Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath d='M12 2L2 12l10 10 10-10L12 2z' fill='%23144A87'/%3e%3c/svg%3e">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/react-grid-layout/1.4.4/styles.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/react-resizable/3.0.5/styles.min.css" />
+    <style>
+      .splitter-handle-vertical {
+        width: 24px !important;
+        height: 100% !important;
+        cursor: col-resize !important;
+        position: absolute !important;
+        right: -12px !important;
+        top: 0 !important;
+        z-index: 10 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .splitter-handle-vertical::before {
+        content: '';
+        width: 4px !important;
+        height: 48px !important;
+        background-color: #334155 !important;
+        border-radius: 4px;
+        transition: all 0.2s ease !important;
+      }
+      .splitter-handle-vertical:hover::before {
+        background-color: #4A90E2 !important;
+        width: 8px !important;
+      }
+
+      .splitter-handle-horizontal {
+        height: 24px !important;
+        width: 100% !important;
+        cursor: row-resize !important;
+        position: absolute !important;
+        bottom: -12px !important;
+        left: 0 !important;
+        z-index: 10 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .splitter-handle-horizontal::before {
+        content: '';
+        height: 4px !important;
+        width: 48px !important;
+        background-color: #334155 !important;
+        border-radius: 4px;
+        transition: all 0.2s ease !important;
+      }
+      .splitter-handle-horizontal:hover::before {
+        background-color: #4A90E2 !important; /* creativity-orange */
+        height: 8px !important;
+      }
+      .react-resizable {
+        position: relative;
+      }
+      .react-resizable-handle {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-origin: content-box;
+        box-sizing: border-box;
+        padding: 0;
+      }
+    </style>
     <script>
       // NOTE: This is a workaround for a browser-only environment where process.env is not available.
       // In a typical build setup, these variables would be injected automatically.
@@ -19,26 +80,40 @@
           // Get your key from Google AI Studio: https://aistudio.google.com/app/apikey
           API_KEY: "YOUR_GEMINI_API_KEY_HERE",
           
+          // The Notion API key for internal integration.
+          // This allows the app to access a specific Notion workspace without user-by-user OAuth.
+          NOTION_API_KEY: "ntn_N97922614998pjOqnks93TCh1n1xmPxtBd11vNHkiwN59H",
+
           // The Google Client ID has been set for you.
           // If you need to change it, get it from the Google Cloud Console: https://console.cloud.google.com/apis/credentials
-          GOOGLE_CLIENT_ID: "155749101771-lvmc383eus9pg407dedlp3r2q330gukj.apps.googleusercontent.com"
+          GOOGLE_CLIENT_ID: "155749101771-lvmc383eus9pg407dedlp3r2q330gukj.apps.googleusercontent.com",
+          
+          // Spreadsheet IDs
+          EXECUTION_SPREADSHEET_ID: "156rACoJheFPD4lftBrvVqXScxDp1y8d3msB1tFWbEAc",
+          STRATEGY_SPREADSHEET_ID: "1iJ3SoeZiaeBbGm8KIwRYtEKwZQ88FPvQ17o2Xwo-AJc"
         }
       };
     </script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              'heritage-blue': '#144A87',
-              'creativity-orange': '#FF8C42',
-              'cream': '#FDF6E3',
-              'midnight-navy': '#0A192F',
+              'dark-bg': '#1F2437',
+              'dark-surface': '#2C3249',
+              'dark-sidebar': '#262C40',
+              'dark-border': '#3E455D',
+              'text-light': '#FFFFFF',
+              'text-muted': '#A3A9C0',
+              'accent-blue': '#60A5FA',
+              'accent-orange': '#F59E0B',
+              'accent-yellow': '#FBBF24',
+              'progress-blue-start': '#00BFFF',
+              'progress-blue-end': '#4A90E2',
               'success-green': '#10B981',
               'error-red': '#EF4444',
-              'warning-yellow': '#F59E0B',
             },
             fontFamily: {
               display: ['Montserrat', 'sans-serif'],
@@ -51,17 +126,18 @@
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.1.1/",
-    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.21.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.3.19",
-    "react-grid-layout": "https://esm.sh/react-grid-layout@1.4.4"
+    "framer-motion": "https://esm.sh/framer-motion@11.3.19",
+    "react-resizable": "https://esm.sh/react-resizable@3.0.5?deps=react@18.3.1",
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "react/": "https://esm.sh/react@18.3.1/"
   }
 }
 </script>
 </head>
-  <body class="bg-heritage-blue text-cream font-sans antialiased">
+  <body class="bg-dark-bg text-text-light font-sans antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

@@ -7,12 +7,12 @@ type BadgeProps = {
 
 export const Badge: React.FC<BadgeProps> = ({ color = 'gray', children }) => {
   const colorClasses = {
-    blue: 'bg-heritage-blue/10 text-heritage-blue',
-    orange: 'bg-creativity-orange/10 text-creativity-orange',
+    blue: 'bg-accent-blue/10 text-accent-blue',
+    orange: 'bg-accent-orange/10 text-accent-orange',
     green: 'bg-success-green/10 text-success-green',
     red: 'bg-error-red/10 text-error-red',
-    yellow: 'bg-warning-yellow/10 text-warning-yellow',
-    gray: 'bg-midnight-navy/10 text-midnight-navy/80',
+    yellow: 'bg-accent-yellow/10 text-accent-yellow',
+    gray: 'bg-dark-border/50 text-text-muted',
   };
 
   return (
