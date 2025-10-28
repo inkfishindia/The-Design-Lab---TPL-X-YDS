@@ -1,7 +1,7 @@
 // FIX: Add import for React to resolve namespace error
 import React from 'react';
 
-export type ViewName = 'dashboard' | 'business' | 'projects' | 'marketing' | 'partners' | 'customers' | 'reports' | 'notion' | 'commandCentre' | 'settings' | 'teamSettings' | 'visualSystemMapView';
+export type ViewName = 'dashboard' | 'business' | 'projects' | 'marketing' | 'partners' | 'customers' | 'reports' | 'notion' | 'commandCentre' | 'settings' | 'teamSettings' | 'visualSystemMapView' | 'businessModelCanvas' | 'strategy';
 
 export type NavItem = { 
     viewName: ViewName,
@@ -100,9 +100,7 @@ export interface NotionTableData {
   rows: (string | null)[][];
 }
 
-export interface ProcessedTableData extends NotionTableData {
-    title: string;
-}
+export type ProcessedTableData = NotionTableData & { title: string; };
 export type ProcessedContent = string | ProcessedTableData | null;
 
 // Notion Specific Types
@@ -324,7 +322,6 @@ export interface Opportunity {
     lead_fk_resolved?: string;
     sdr_owner_fk?: UserID;
     sdr_owner_fk_resolved?: string;
-    projected_mov?: number;
     [key: string]: any;
 }
 
@@ -419,6 +416,173 @@ export interface AppStore {
     'Brand Name'?: string;
     'Email Address'?: string;
     'Mobile Number'?: string;
+    [key: string]: any;
+}
+
+// Business Model Canvas Types
+export interface BmcSegment {
+    rowIndex: number;
+    segmentId: string;
+    segmentName: string;
+    customerProfile: string;
+    flywheelId: string; // FK to BmcFlywheel
+    status: string;
+    nineMonthRevenue: string;
+    percentRevenue: string;
+    aov: string;
+    jobsToBeDone: string;
+    keyPainPoints: string;
+    decisionCriteria: string;
+    notes: string;
+    customer_facing: string;
+    Positioning: string;
+    flywheelId_resolved?: string; // Hydrated
+    [key: string]: any;
+}
+
+export interface BmcBusinessUnit {
+    rowIndex: number;
+    businessUnitId: string;
+    businessUnitName: string;
+    coreOffering: string;
+    primarySegments: string; // FK to BmcSegment (multiple)
+    flywheelId: string; // FK to BmcFlywheel
+    volumeRange: string;
+    primaryOwner: string; // FK to BmcTeamMember
+    nineMonthRevenue: string;
+    percentRevenue: string;
+    pricingModel: string;
+    notes: string;
+    flywheelId_resolved?: string; // Hydrated
+    primarySegments_resolved?: string; // Hydrated display
+    primaryOwner_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface BmcFlywheel {
+    rowIndex: number;
+    flywheelId: string;
+    flywheelName: string;
+    customerStruggleSolved: string;
+    acquisitionModel: string;
+    serviceModel: string;
+    serves: string; // FK to BmcSegment (multiple)
+    keyMetrics: string;
+    serves_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface RevenueStream {
+    rowIndex: number;
+    revenueStreamId: string;
+    businessUnitId: string; // FK to BmcBusinessUnit
+    segmentId: string; // FK to BmcSegment
+    aov: string;
+    grossMargin: string;
+    grossProfitPerOrder: string;
+    cac: string;
+    contributionMargin: string;
+    nineMonthRevenue: string;
+    estimatedOrders: string;
+    notes: string;
+    businessUnitId_resolved?: string; // Hydrated display
+    segmentId_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface CostStructure {
+    rowIndex: number;
+    costId: string;
+    costCategory: string;
+    costType: string;
+    monthlyAmount: string;
+    annualAmount: string;
+    owner: string; // FK to BmcTeamMember (multiple)
+    notes: string;
+    owner_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface Channel {
+    rowIndex: number;
+    channelId: string;
+    channelName: string;
+    channelType: string;
+    platformId: string; // FK to BmcPlatform
+    servesSegments: string; // FK to BmcSegment (multiple)
+    flywheelId: string; // FK to BmcFlywheel
+    motionType: string;
+    notes: string;
+    platformId_resolved?: string; // Hydrated display
+    servesSegments_resolved?: string; // Hydrated display
+    flywheelId_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface BmcPlatform {
+    rowIndex: number;
+    platformId: string;
+    platformName: string;
+    platformType: string;
+    purpose: string;
+    status: string;
+    owner: string; // FK to BmcTeamMember
+    notes: string;
+    owner_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface BmcTeamMember {
+    rowIndex: number;
+    personId: string;
+    fullName: string;
+    role: string;
+    primaryHub: string; // FK to BmcHub
+    ownsBusinessUnits: string; // FK to BmcBusinessUnit (multiple)
+    keyResponsibility: string;
+    notes: string;
+    primaryHub_resolved?: string; // Hydrated display
+    ownsBusinessUnits_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface BmcHub {
+    rowIndex: number;
+    hubId: string;
+    hubName: string;
+    hubType: string;
+    headCount: string;
+    primaryOwner: string; // FK to BmcTeamMember
+    keyActivities: string;
+    notes: string;
+    primaryOwner_resolved?: string; // Hydrated display
+    [key: string]: any;
+}
+
+export interface BmcPartner {
+    rowIndex: number;
+    partnerId: string;
+    partnerName: string;
+    partnerType: string;
+    role: string;
+    riskLevel: string;
+    status: string;
+    contractTerms: string;
+    notes: string;
+    [key: string]: any;
+}
+
+export interface BmcMetric {
+    rowIndex: number;
+    metricId: string;
+    metricName: string;
+    category: string;
+    currentValue: string;
+    status: string;
+    target: string;
+    owner: string; // FK to BmcTeamMember
+    notes: string;
+    owner_resolved?: string; // Hydrated display
     [key: string]: any;
 }
 

@@ -1,18 +1,8 @@
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { DiamondLogo } from './icons/DiamondLogo';
 import { ChevronDoubleLeftIcon } from './icons/ChevronDoubleLeftIcon';
 import { ChevronDoubleRightIcon } from './icons/ChevronDoubleRightIcon';
-
-type NavItem = {
-    viewName: string;
-    label: string;
-    // FIX: Changed icon type to be a ReactElement that accepts a className prop, ensuring type safety for React.cloneElement.
-    icon: React.ReactElement<{ className?: string }>;
-};
+import type { NavItem } from '../types';
 
 interface SidebarProps {
     activeView: string;

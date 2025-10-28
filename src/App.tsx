@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,7 +14,7 @@ import { ToastProvider, useToast } from './components/ui/Toast';
 import { clearSheetCache } from './services/cachingService';
 
 import { initGoogleAuth, signIn, signOut } from './services/googleAuthService';
-import type { GoogleUser, TokenResponse } from './types';
+import type { GoogleUser, TokenResponse, ViewName } from './types';
 
 import { DashboardIcon } from './components/icons/DashboardIcon';
 import { ProjectIcon } from './components/icons/ProjectIcon';
@@ -30,19 +26,21 @@ import { LeadsIcon } from './components/icons/LeadsIcon';
 import { NotionIcon } from './components/icons/NotionIcon';
 import { BrainIcon } from './components/icons/BrainIcon';
 import { CommandCentreIcon } from './components/icons/CommandCentreIcon';
+import { StrategyIcon } from './components/icons/StrategyIcon'; // Reusing StrategyIcon for BMC for now
 
 import { BusinessView } from './components/BusinessView';
 import { MarketingView } from './components/MarketingView';
 import { CustomersView } from './components/CustomersView';
 import { ReportsView } from './components/ReportsView';
 import { StrategyView } from './components/StrategyView';
+import { BusinessModelCanvasView } from './components/BusinessModelCanvasView'; // New Import
 import { Button } from './components/ui/Button';
 import { GoogleIcon } from './components/icons/GoogleIcon';
 
 type NavItem = { 
-    viewName: 'dashboard' | 'business' | 'projects' | 'marketing' | 'partners' | 'customers' | 'reports' | 'notion' | 'strategy' | 'commandCentre' | 'settings' | 'teamSettings',
+    viewName: ViewName,
     label: string,
-    // FIX: Changed icon type to be a ReactElement that accepts a className prop, ensuring type safety with React.cloneElement.
+    // FIX: Changed icon type to be a ReactElement that accepts a className prop, ensuring type safety for React.cloneElement.
     icon: React.ReactElement<{ className?: string }>
 };
 
@@ -52,14 +50,13 @@ const allNavItems: NavItem[] = [
     { viewName: 'business', label: 'Business', icon: <BusinessUnitIcon className="w-6 h-6" /> },
     { viewName: 'projects', label: 'Projects', icon: <ProjectIcon className="w-6 h-6" /> },
     { viewName: 'strategy', label: 'Strategy', icon: <BrainIcon className="w-6 h-6" /> },
+    { viewName: 'businessModelCanvas', label: 'Business Model Canvas', icon: <StrategyIcon className="w-6 h-6" /> }, // New Nav Item
     { viewName: 'marketing', label: 'Marketing', icon: <MarketingIcon className="w-6 h-6" /> },
     { viewName: 'partners', label: 'Partners', icon: <UsersIcon className="w-6 h-6" /> },
     { viewName: 'customers', label: 'Customers', icon: <LeadsIcon className="w-6 h-6" /> },
     { viewName: 'reports', label: 'Reports', icon: <ReportsIcon className="w-6 h-6" /> },
     { viewName: 'notion', label: 'Notion', icon: <NotionIcon className="w-6 h-6" /> },
 ];
-
-type ViewName = NavItem['viewName'];
 
 // Helper function to get initial state from localStorage
 const getInitialAuthState = () => {
@@ -87,6 +84,7 @@ const getInitialAuthState = () => {
     } catch (error) {
         console.error("Failed to load auth state from localStorage", error);
         // On error, clear potentially corrupted data
+        // FIX: Replaced `LPRemoveItem` with `localStorage.removeItem`
         localStorage.removeItem('googleAuthToken');
         localStorage.removeItem('googleAuthUser');
         localStorage.removeItem('googleAuthExpiry');
@@ -172,6 +170,7 @@ const AppContent: React.FC = () => {
         business: <BusinessView isAuthenticated={isAuthenticated} token={token} />,
         projects: <ProjectDashboardView isAuthenticated={isAuthenticated} token={token} user={user} onSignInRequest={handleSignInRequest} />,
         strategy: <StrategyView isAuthenticated={isAuthenticated} token={token} />,
+        businessModelCanvas: <BusinessModelCanvasView isAuthenticated={isAuthenticated} token={token} />, // New View
         marketing: <MarketingView isAuthenticated={isAuthenticated} token={token} user={user} />,
         partners: <LeadsDashboardView isAuthenticated={isAuthenticated} token={token} user={user} onSignInRequest={handleSignInRequest} />,
         customers: <CustomersView />,

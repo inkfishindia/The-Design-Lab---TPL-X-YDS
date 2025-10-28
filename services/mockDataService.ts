@@ -1,4 +1,4 @@
-import type { SheetRow, Project, SheetUser, BusinessUnit, Flywheel, Hub, Touchpoint, CustomerSegmentFoundation, ProjectTask } from '../types';
+import type { SheetRow, Project, SheetUser, BusinessUnit, Flywheel, Hub, Touchpoint, CustomerSegmentFoundation, ProjectTask, BmcSegment, BmcBusinessUnit, BmcFlywheel, RevenueStream, CostStructure, Channel, BmcPlatform, BmcTeamMember, BmcHub, BmcPartner, BmcMetric } from '../types';
 import { SheetKey } from './configService';
 
 const mockUsers: SheetUser[] = [
@@ -44,6 +44,19 @@ const mockCustomerSegments: CustomerSegmentFoundation[] = [
     { rowIndex: 1, 'Customer segment': 'Startup Founders', Purpose: 'To provide tools for growth' }
 ];
 
+const mockBmcSegments: BmcSegment[] = [];
+const mockBmcBusinessUnits: BmcBusinessUnit[] = [];
+const mockBmcFlywheels: BmcFlywheel[] = [];
+const mockRevenueStreams: RevenueStream[] = [];
+const mockCostStructure: CostStructure[] = [];
+const mockChannels: Channel[] = [];
+const mockBmcPlatforms: BmcPlatform[] = [];
+const mockBmcTeam: BmcTeamMember[] = [];
+const mockBmcHubs: BmcHub[] = [];
+const mockBmcPartners: BmcPartner[] = [];
+const mockBmcMetrics: BmcMetric[] = [];
+
+
 const allMockData: Record<string, SheetRow[]> = {
     [SheetKey.PROJECTS]: mockProjects,
     [SheetKey.TASKS]: mockTasks,
@@ -54,6 +67,19 @@ const allMockData: Record<string, SheetRow[]> = {
     [SheetKey.TOUCHPOINTS]: mockTouchpoints,
     [SheetKey.CUSTOMER_SEGMENT]: mockCustomerSegments,
     [SheetKey.APP_STORES]: [],
+    
+    // Business Model Canvas Mock Data (empty for now)
+    [SheetKey.BMC_SEGMENTS]: mockBmcSegments,
+    [SheetKey.BMC_BUSINESS_UNITS]: mockBmcBusinessUnits,
+    [SheetKey.BMC_FLYWHEELS]: mockBmcFlywheels,
+    [SheetKey.BMC_REVENUE_STREAMS]: mockRevenueStreams,
+    [SheetKey.BMC_COST_STRUCTURE]: mockCostStructure,
+    [SheetKey.BMC_CHANNELS]: mockChannels,
+    [SheetKey.BMC_PLATFORMS]: mockBmcPlatforms,
+    [SheetKey.BMC_TEAM]: mockBmcTeam,
+    [SheetKey.BMC_HUBS]: mockBmcHubs,
+    [SheetKey.BMC_PARTNERS]: mockBmcPartners,
+    [SheetKey.BMC_METRICS]: mockBmcMetrics,
 };
 
 export const getMockData = (sheetKey: SheetKey): any[] => {
